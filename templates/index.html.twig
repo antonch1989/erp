@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+<div class="row" xmlns="http://www.w3.org/1999/html">
+    <div class="col-sm-12">
+        <br>
+        <div class="btn-group" role="group">
+            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'charged' }) }}" class="btn btn-info {% if activeRoom.status == 'charged'%}active{% endif %}">Charge</a>
+            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'no_charges' }) }}" class="btn btn-info {% if activeRoom.status == 'no_charges'%}active{% endif %}">No Charges</a>
+            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'occupied' }) }}" class="btn btn-info {% if activeRoom.status == 'occupied'%}active{% endif %}">Occupied</a>
+            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'denied' }) }}" class="btn btn-info {% if activeRoom.status == 'denied'%}active{% endif %}" aria-pressed="true">Denied service</a>
+            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'expired' }) }}" class="btn btn-info {% if activeRoom.status == 'expired'%}active{% endif %}">Expired/Damaged</a>
+        </div>
+
+        <br>
+        <br>
+        <div>
+            <h4>Floors:</h4>
+
+            <div class="btn-group" role="group" aria-label="Basic example">
+                {% for floor in building.floors %}
+                    <a role="button" href="{{ path('main_page', {'activeFloor': floor.id }) }}" class="btn btn-info {% if floor.id == activeFloor.id %}active{% endif %}">{{ floor.number }}</a>
+                {% endfor %}
+            </div>
+
+            <br>
+            <br>
+            <h4>Rooms:</h4>
+
+            <div class="btn-group" role="group" aria-label="Basic example">
+                {% for room in activeFloor.rooms %}
+                    <a role="button" href="{{ path('main_page', {'activeRoom': room.id, 'activeFloor': activeFloor.id }) }}" class="btn {% if room.isOutOfOrder %}btn-danger{% else %}btn-info{% endif %} {% if room.id == activeRoom.id %}active{% endif %}">{{ room.number }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-9">
+        {% if activeRoom.isOutOfOrder %}
+            <br>
+            <div class="alert alert-danger" role="alert">
+                This room is out of order
+            </div>
+        {% endif %}
+        <br>
+        <h4>Room {{ activeRoom.number }}:</h4>
+        <hr>
+
+        <form action="{{ path('add_replenishments') }}" method="post" id="replenishment_form">
+            <div class="row">
+            {% for categoryName, productArray in products %}
+                <div class="col-sm-6" style="margin-bottom: 30px;">
+                    <h5>{{ categoryName }}</h5>
+                    {% for productData in productArray %}
+
+                        {% set product = productData[0] %}
+                        {% set roomProduct = productData[1] %}
+
+                        <div>
+                            <div class="box">
+                                <input type="checkbox" id="checkbox-2-4" class="regular-checkbox big-checkbox" />
+                                <input type="hidden" id="room_product_{{ roomProduct.id }}" name="room_product_{{ roomProduct.id }}" value="0" />
+                                <label for="checkbox-2-4" data-after="" data-room-product-id="{{ roomProduct.id }}">{{ product.name }} <sup>{{ roomProduct.itemsNumber }}</sup></label>
+                                <ul class="select-number" id="number">
+                                    <li>0</li>
+                                    <li>1</li>
+                                    <li>2</li>
+                                    <li>3</li>
+                                    <li>4</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <button id="button" type="submit">Submit</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="col-sm-3">
+        <br>
+        <br>
+        <div>
+            <a href="#" class="btn btn-success">Restock</a>
+        </div>
+
+        <br>
+        <div>
+            <h5>Replenishments</h5>
+            <hr>
+            {% for productName in replenishments %}
+                {{ productName }}<br>
+            {% endfor %}
+        </div>
+
+        <br>
+        <div>
+            <h5>Restocks</h5>
+        </div>
+
+        {{ form_start(outOfOrderForm) }}
+            {{ form_widget(outOfOrderForm) }}
+            <input type="submit" value="Save">
+        {{ form_end(outOfOrderForm) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(window).on('load', function () {
+            $('.regular-checkbox').prop("checked", "unchecked");
+        });
+        $(document).ready(function(){
+
+            // checkbox and dropdown
+            $('.regular-checkbox').each(function(index, element){
+
+                var label = $(element).parent().find('label');
+                var selectNumber = $(element).parent().find('.select-number');
+                var eachLi = $(element).parent().find("#number li");
+
+                var click_counter = 0;
+                // checkbox dropdown
+                $(element).click(function(){
+                    if($(element).prop("checked")==false){
+                        $(element).prop("checked", "checked");
+                        var temp = label.attr('data-after');
+                        if(temp == ''){
+                            label.attr('data-after', '1');
+                        }
+                        click_counter++;
+                    }
+                    if($(element).prop("checked")==true && click_counter>1){
+                        selectNumber.show(500);
+                    }
+                });
+
+                eachLi.click(function(){
+                    var value = $(this).html();
+                    selectNumber.hide(500);
+                    if(value==0){
+                        click_counter = 0;
+                        $(element).prop("checked",false);
+                        label.attr('data-after', '');
+                    }
+                    else{
+                        label.attr('data-after', value);
+                    }
+                });
+            });
+
+            // on submit function
+            $("#button").click(function(event){
+
+                event.preventDefault();
+
+                $('.regular-checkbox').each(function(index, element){
+                    var label = $(element).parent().find('label');
+
+                    productId = label.attr('data-room-product-id');
+                    console.log(productId)
+
+                    $("#room_product_"+productId).val(label.attr('data-after'));
+                });
+
+                form = $("#replenishment_form")
+                form.submit()
+            });
+
+        });
+    </script>
+{% endblock %}

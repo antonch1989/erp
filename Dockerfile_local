@@ -1,0 +1,12 @@
+FROM php:7.3-fpm
+
+WORKDIR /var/www/current
+
+COPY . /var/www/current
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libzip-dev git zip unzip && \
+    docker-php-ext-install zip pdo pdo_mysql
+
+RUN curl --silent --show-error https://getcomposer.org/installer | php
+RUN php composer.phar install --no-interaction --prefer-dist --optimize-autoloader
