@@ -12,4 +12,5 @@ return [
     FOS\UserBundle\FOSUserBundle::class => ['all' => true],
     Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle::class => ['all' => true],
     EasyCorp\Bundle\EasyDeployBundle\EasyDeployBundle::class => ['all' => true],
+    Tbbc\MoneyBundle\TbbcMoneyBundle::class => ['all' => true],
 ];

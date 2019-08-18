@@ -65,6 +65,10 @@ class DefaultController extends AbstractController
             $em->persist($activeRoom);
             $em->flush();
 
+            $message = $activeRoom->isOutOfOrder() ? 'The room is out of order now' : 'The room is in order now';
+            $this->addFlash('success', $message);
+
+
             return $this->redirectToRoute('main_page', $request->query->all());
         }
 
@@ -92,6 +96,8 @@ class DefaultController extends AbstractController
         $em = $this->get('doctrine')->getManager();
         $em->flush();
 
+        $this->addFlash('success', sprintf('The room status changed to "%s"', $status));
+
         return $this->redirect($previousUrl);
     }
 
@@ -118,6 +124,8 @@ class DefaultController extends AbstractController
         }
 
         $em->flush();
+
+        $this->addFlash('success', 'The replenishments were added');
 
         return new RedirectResponse($previousUrl);
     }

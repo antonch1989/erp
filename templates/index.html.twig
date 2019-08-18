@@ -3,6 +3,20 @@
 {% block content %}
 <div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="col-sm-12">
+        <div style="height: 50px;">
+            <div id="flashes">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <br>
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <br>
         <br>
         <div class="btn-group" role="group">
             <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'charged' }) }}" class="btn btn-info {% if activeRoom.status == 'charged'%}active{% endif %}">Charge</a>
@@ -58,7 +72,7 @@
                         {% set roomProduct = productData[1] %}
 
                         <div>
-                            <div class="box">
+                            <div class="box" style="float: left;">
                                 <input type="checkbox" id="checkbox-2-4" class="regular-checkbox big-checkbox" />
                                 <input type="hidden" id="room_product_{{ roomProduct.id }}" name="room_product_{{ roomProduct.id }}" value="0" />
                                 <label for="checkbox-2-4" data-after="" data-room-product-id="{{ roomProduct.id }}">{{ product.name }} <sup>{{ roomProduct.itemsNumber }}</sup></label>
@@ -70,6 +84,8 @@
                                     <li>4</li>
                                 </ul>
                             </div>
+                            <div style="float: right;">{{ product.cost | money_format }}</div>
+                            <div class="clearfix"></div>
                         </div>
 
                     {% endfor %}
@@ -121,6 +137,8 @@
             $('.regular-checkbox').prop("checked", "unchecked");
         });
         $(document).ready(function(){
+
+            $('#flashes').fadeOut(4000);
 
             // checkbox and dropdown
             $('.regular-checkbox').each(function(index, element){

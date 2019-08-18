@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Money\Currency;
+use Money\Money;
 
 /**
  * @ORM\Entity()
@@ -76,9 +78,9 @@ class Product
         $this->name = $name;
     }
 
-    public function getCost(): int
+    public function getCost(): Money
     {
-        return $this->cost;
+        return new Money($this->cost, new Currency('USD'));
     }
 
     public function setCost(int $cost): void

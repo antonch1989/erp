@@ -116,7 +116,7 @@ class Room
         $this->floor = $floor;
     }
 
-    public function getIsOutOfOrder(): bool
+    public function isOutOfOrder(): bool
     {
         return $this->isOutOfOrder;
     }
