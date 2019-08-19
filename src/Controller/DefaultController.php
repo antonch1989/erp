@@ -102,9 +102,9 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/add-replenishments", name="add_replenishments")
+     * @Route("/add-replenishments/{room}", name="add_replenishments")
      */
-    public function addReplenishments(Request $request): RedirectResponse
+    public function addReplenishments(Room $room, Request $request): RedirectResponse
     {
         $previousUrl = $request->headers->get('referer');
         /** @var EntityManagerInterface $em */
@@ -122,6 +122,8 @@ class DefaultController extends AbstractController
             $roomProduct = $em->getRepository(RoomProduct::class)->find($roomProductId);
             $roomProduct->setReplenishmentNumber($roomProduct->getReplenishmentNumber() + $replenishmentNumber);
         }
+        $room->setStatus(Room::STATUS_CHARGED);
+        $em->persist($room);
 
         $em->flush();
 

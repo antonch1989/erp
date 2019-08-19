@@ -18,15 +18,14 @@
 
         <br>
         <br>
-        <div class="btn-group" role="group">
-            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'charged' }) }}" class="btn btn-info {% if activeRoom.status == 'charged'%}active{% endif %}">Charge</a>
-            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'no_charges' }) }}" class="btn btn-info {% if activeRoom.status == 'no_charges'%}active{% endif %}">No Charges</a>
-            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'occupied' }) }}" class="btn btn-info {% if activeRoom.status == 'occupied'%}active{% endif %}">Occupied</a>
-            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'denied' }) }}" class="btn btn-info {% if activeRoom.status == 'denied'%}active{% endif %}" aria-pressed="true">Denied service</a>
-            <a role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'expired' }) }}" class="btn btn-info {% if activeRoom.status == 'expired'%}active{% endif %}">Expired/Damaged</a>
+        <div>
+            <button id="charge" style="margin-right: 20px;" role="button" class="btn btn-lg btn-primary {% if activeRoom.status == 'charged'%}active-button{% endif %}">Charge</button>
+            <a style="margin-right: 20px;" role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'no_charges' }) }}" class="btn btn-lg btn-secondary {% if activeRoom.status == 'no_charges'%}active-button{% endif %}">No Charges</a>
+            <a style="margin-right: 20px;" role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'occupied' }) }}" class="btn btn-lg btn-danger {% if activeRoom.status == 'occupied'%}active-button{% endif %}">Occupied</a>
+            <a style="margin-right: 20px;" role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'denied' }) }}" class="btn btn-lg btn-info {% if activeRoom.status == 'denied'%}active-button{% endif %}" aria-pressed="true">Denied service</a>
+            <a style="margin-right: 20px;" role="button" href="{{ path('update_room_status', {'room': activeRoom.id, 'status': 'expired' }) }}" class="btn btn-lg btn-dark {% if activeRoom.status == 'expired'%}active-button{% endif %}">Expired/Damaged</a>
         </div>
 
-        <br>
         <br>
         <div>
             <h4>Floors:</h4>
@@ -61,7 +60,7 @@
         <h4>Room {{ activeRoom.number }}:</h4>
         <hr>
 
-        <form action="{{ path('add_replenishments') }}" method="post" id="replenishment_form">
+        <form action="{{ path('add_replenishments', {'room': activeRoom.id}) }}" method="post" id="replenishment_form">
             <div class="row">
             {% for categoryName, productArray in products %}
                 <div class="col-sm-6" style="margin-bottom: 30px;">
@@ -92,12 +91,6 @@
                 </div>
             {% endfor %}
             </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <button id="button" type="submit">Submit</button>
-                </div>
-            </div>
-
         </form>
     </div>
     <div class="col-sm-3">
@@ -138,6 +131,24 @@
         });
         $(document).ready(function(){
 
+            // on submit function
+            $("#charge").click(function(event){
+
+                event.preventDefault();
+
+                $('.regular-checkbox').each(function(index, element){
+                    var label = $(element).parent().find('label');
+
+                    productId = label.attr('data-room-product-id');
+                    console.log(productId)
+
+                    $("#room_product_"+productId).val(label.attr('data-after'));
+                });
+
+                form = $("#replenishment_form")
+                form.submit()
+            });
+
             $('#flashes').fadeOut(4000);
 
             // checkbox and dropdown
@@ -177,23 +188,7 @@
                 });
             });
 
-            // on submit function
-            $("#button").click(function(event){
 
-                event.preventDefault();
-
-                $('.regular-checkbox').each(function(index, element){
-                    var label = $(element).parent().find('label');
-
-                    productId = label.attr('data-room-product-id');
-                    console.log(productId)
-
-                    $("#room_product_"+productId).val(label.attr('data-after'));
-                });
-
-                form = $("#replenishment_form")
-                form.submit()
-            });
 
         });
     </script>
