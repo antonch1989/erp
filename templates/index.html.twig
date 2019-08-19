@@ -61,7 +61,7 @@
         <hr>
 
         <form action="{{ path('add_replenishments', {'room': activeRoom.id}) }}" method="post" id="replenishment_form">
-            <div class="row">
+            <div class="row demo2">
             {% for categoryName, productArray in products %}
                 <div class="col-sm-6" style="margin-bottom: 30px;">
                     <h5>{{ categoryName }}</h5>
@@ -72,9 +72,9 @@
 
                         <div>
                             <div class="box" style="float: left;">
-                                <input type="checkbox" id="checkbox-2-4" class="regular-checkbox big-checkbox" />
                                 <input type="hidden" id="room_product_{{ roomProduct.id }}" name="room_product_{{ roomProduct.id }}" value="0" />
-                                <label for="checkbox-2-4" data-after="" data-room-product-id="{{ roomProduct.id }}">{{ product.name }} <sup>{{ roomProduct.itemsNumber }}</sup></label>
+                                <input type="checkbox" id="checkbox-{{ roomProduct.id }}" class="regular-checkbox big-checkbox" />
+                                <label for="checkbox-{{ roomProduct.id }}" data-after="" data-room-product-id="{{ roomProduct.id }}"></label>
                                 <ul class="select-number" id="number">
                                     <li>0</li>
                                     <li>1</li>
@@ -83,7 +83,8 @@
                                     <li>4</li>
                                 </ul>
                             </div>
-                            <div style="float: right;">{{ product.cost | money_format }}</div>
+                            <div class="float-left">{{ product.name }} <sup>{{ roomProduct.itemsNumber }}</sup></div>
+                            <div class="float-right">{{ product.cost | money_format }}</div>
                             <div class="clearfix"></div>
                         </div>
 
@@ -116,7 +117,7 @@
 
         {{ form_start(outOfOrderForm) }}
             {{ form_widget(outOfOrderForm) }}
-            <input type="submit" value="Save">
+            <input type="submit" class="btn btn-success" value="Save">
         {{ form_end(outOfOrderForm) }}
     </div>
 </div>
@@ -140,8 +141,6 @@
                     var label = $(element).parent().find('label');
 
                     productId = label.attr('data-room-product-id');
-                    console.log(productId)
-
                     $("#room_product_"+productId).val(label.attr('data-after'));
                 });
 
@@ -177,9 +176,9 @@
                 eachLi.click(function(){
                     var value = $(this).html();
                     selectNumber.hide(500);
-                    if(value==0){
+                    if(value == 0){
                         click_counter = 0;
-                        $(element).prop("checked",false);
+                        $(element).prop("checked", false);
                         label.attr('data-after', '');
                     }
                     else{
